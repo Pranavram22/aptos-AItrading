@@ -1,16 +1,34 @@
-// app/page.tsx
+import React from 'react';
+import './home.css';
 
-import Link from 'next/link'
-
-export default function Home() {
+const Home = () => {
   return (
-    <div style={{ textAlign: 'center', padding: '20px' }}>
-      <h1>Welcome to the Aptos AI Trading App</h1>
-      <p>Your gateway to automated trading on the Aptos blockchain.</p>
-      
-      <Link href="/tradingpage" style={{ fontSize: '20px', color: 'blue', textDecoration: 'underline' }}>
-        Go to Trading Platform
-      </Link>
+    <div className="home-container">
+      <header className="header">
+        <nav className="navbar">
+          <div className="logo">
+            {/* Image removed */}
+          </div>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/tradingpage">Trading-Platform</a></li>
+            <li><a href="/market-overview">Market Overview</a></li>
+            <li><a href="/riskmanage">Risk Management</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <main className="main">
+        <h1 className="title">Welcome to the Aptos AI Trading Platform</h1>
+        <p>
+        The Aptos Trading Platform offers a seamless and efficient trading experience, built on the secure and scalable Aptos blockchain. It features an intuitive Trading Platform with real-time data, customizable charts, and fast order execution for a wide range of assets. The Market Overview provides traders with up-to-date market trends, asset performance, and in-depth analytics to make informed decisions. With robust Risk Management tools, including stop-loss orders, trailing stops, and personalized risk analysis, the platform helps safeguard your investments and reduce exposure to market volatility.</p>
+      </main>
+
+      <footer className="footer">
+        <p>&copy; 2024 Aptos AI Trading Platform</p>
+      </footer>
     </div>
-  )
-}
+  );
+};
+
+export default Home;
