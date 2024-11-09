@@ -1,4 +1,6 @@
 // src/app/layout.tsx
+import './globals.css'
+
 export default function RootLayout({
   children,
 }: {
@@ -6,7 +8,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-gray-900 min-h-screen">
+      <head>
+        <title>AI Trading Platform</title>
+      </head>
+      <body>
         {children}
       </body>
     </html>
