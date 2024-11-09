@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@tremor/react": "^3.18.3",
+    "lucide-react": "^0.456.0"
+  }
+}
