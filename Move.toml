@@ -4,8 +4,10 @@ version = "1.0.0"
 authors = []
 
 [addresses]
+trading_bot_addr = "_"
 
 [dev-addresses]
+trading_bot_addr = "0x1"
 
 [dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-framework.git"
