@@ -12,7 +12,7 @@ const Home = () => {
           <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/tradingpage">Trading-Platform</a></li>
-            <li><a href="/market-overview">Market Overview</a></li>
+            <li><a href="/marketoverview">Market Overview</a></li>
             <li><a href="/riskmanage">Risk Management</a></li>
           </ul>
         </nav>
