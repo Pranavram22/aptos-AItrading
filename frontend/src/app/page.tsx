@@ -1,27 +1,29 @@
-"use client";
+"use client"
+import React, { useState, useEffect } from 'react';
+import { FaPlay, FaStop, FaChartLine, FaHistory, FaCog, FaWallet } from 'react-icons/fa';
 
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { useState, useEffect } from "react";
-
-interface Trade {
+interface TradeHistory {
   type: "BUY" | "SELL";
+  amount: number;
   price: number;
   timestamp: string;
 }
 
-export default function Home() {
-  const { connect, account, connected, disconnect } = useWallet();
-  const [price, setPrice] = useState<number>(0);
-  const [trades, setTrades] = useState<Trade[]>([]);
+export default function TradingPlatform() {
+  const [currentPrice, setCurrentPrice] = useState<number>(10);
   const [isTrading, setIsTrading] = useState(false);
-  const [balance, setBalance] = useState<string>("0");
+  const [tradeAmount, setTradeAmount] = useState("1");
+  const [tradeHistory, setTradeHistory] = useState<TradeHistory[]>([]);
+  const [profitLoss, setProfitLoss] = useState<number>(0);
+  const [selectedTimeframe, setSelectedTimeframe] = useState("1h");
+  const [balance, setBalance] = useState("1000.00"); // Simulated balance
 
-  // Simulate price movement
+  // Simulated price feed
   useEffect(() => {
     if (isTrading) {
       const interval = setInterval(() => {
-        setPrice(prev => {
-          const change = (Math.random() - 0.5) * 2;
+        setCurrentPrice(prev => {
+          const change = (Math.random() - 0.5) * 0.5;
           return Number((prev + change).toFixed(2));
         });
       }, 3000);
@@ -30,117 +32,149 @@ export default function Home() {
     }
   }, [isTrading]);
 
-  // Simple trading algorithm
+  // Simulated trading logic
   useEffect(() => {
-    if (isTrading && price > 0) {
+    if (isTrading) {
       const interval = setInterval(() => {
-        const tradeType: "BUY" | "SELL" = Math.random() > 0.5 ? "BUY" : "SELL";
-        const newTrade: Trade = {
-          type: tradeType,
-          price: price,
+        const decision = Math.random() > 0.5 ? "BUY" : "SELL";
+        const amount = parseFloat(tradeAmount);
+        
+        const newTrade: TradeHistory = {
+          type: decision,
+          amount: amount,
+          price: currentPrice,
           timestamp: new Date().toLocaleTimeString()
         };
+
+        setTradeHistory(prev => [newTrade, ...prev].slice(0, 10));
         
-        setTrades(prev => [newTrade, ...prev].slice(0, 5));
-      }, 10000);
+        const tradeValue = amount * currentPrice;
+        const tradePL = decision === "BUY" ? -tradeValue : tradeValue;
+        setProfitLoss(prev => Number((prev + tradePL).toFixed(2)));
+        
+      }, 15000);
 
       return () => clearInterval(interval);
     }
-  }, [isTrading, price]);
-
-  // Fetch balance (mock)
-  const fetchBalance = async () => {
-    if (!account?.address) return;
-    try {
-      // This is a mock balance - replace with actual Aptos balance fetch
-      const mockBalance = (Math.random() * 100).toFixed(2);
-      setBalance(mockBalance);
-    } catch (error) {
-      console.error("Error fetching balance:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (connected) {
-      fetchBalance();
-    }
-  }, [connected]);
+  }, [isTrading, currentPrice, tradeAmount]);
 
   return (
-    <main className="container mx-auto px-4 py-8 text-white">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-8">
-          Aptos Trading Bot
-        </h1>
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">AI Trading Platform</h1>
+          <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors">
+            <FaWallet /> Connect Wallet
+          </button>
+        </div>
 
-        {!connected ? (
-          <div className="text-center">
-            <button
-              onClick={() => connect()}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
-            >
-              Connect Wallet
-            </button>
+        {/* Main Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+            <div className="text-gray-400 mb-2 text-sm">Current Price</div>
+            <div className="text-3xl font-bold">${currentPrice.toFixed(2)}</div>
           </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Wallet Info */}
-            <div className="bg-gray-800 rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Wallet Info</h2>
-              <p className="text-gray-300 break-all">{account?.address}</p>
-              <p className="mt-2">Balance: {balance} APT</p>
+          <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+            <div className="text-gray-400 mb-2 text-sm">Balance</div>
+            <div className="text-3xl font-bold">${balance}</div>
+          </div>
+          <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+            <div className="text-gray-400 mb-2 text-sm">Profit/Loss</div>
+            <div className={`text-3xl font-bold ${profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              ${profitLoss.toFixed(2)}
             </div>
+          </div>
+        </div>
 
-            {/* Trading Controls */}
-            <div className="bg-gray-800 rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-4">Trading Controls</h2>
-              <div className="flex gap-4">
+        {/* Trading Controls */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2 bg-gray-800 p-6 rounded-xl shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Trading Controls</h2>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <label className="block text-sm text-gray-400 mb-2">Trade Amount</label>
+                <input
+                  type="number"
+                  value={tradeAmount}
+                  onChange={(e) => setTradeAmount(e.target.value)}
+                  className="w-full bg-gray-700 p-3 rounded-lg text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  min="0.1"
+                  step="0.1"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm text-gray-400 mb-2">Timeframe</label>
+                <select
+                  value={selectedTimeframe}
+                  onChange={(e) => setSelectedTimeframe(e.target.value)}
+                  className="w-full bg-gray-700 p-3 rounded-lg text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+                >
+                  <option value="1h">1 Hour</option>
+                  <option value="4h">4 Hours</option>
+                  <option value="1d">1 Day</option>
+                </select>
+              </div>
+              <div className="flex-1 flex items-end">
                 <button
                   onClick={() => setIsTrading(!isTrading)}
-                  className={`flex-1 py-2 px-4 rounded-lg font-bold ${
+                  className={`w-full p-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors ${
                     isTrading 
-                      ? "bg-red-600 hover:bg-red-700" 
-                      : "bg-green-600 hover:bg-green-700"
-                  } transition-colors`}
+                      ? 'bg-red-600 hover:bg-red-700' 
+                      : 'bg-green-600 hover:bg-green-700'
+                  }`}
                 >
-                  {isTrading ? "Stop Trading" : "Start Trading"}
+                  {isTrading ? <><FaStop /> Stop Trading</> : <><FaPlay /> Start Trading</>}
                 </button>
-                <button
-                  onClick={() => disconnect()}
-                  className="flex-1 bg-gray-600 hover:bg-gray-700 py-2 px-4 rounded-lg font-bold transition-colors"
-                >
-                  Disconnect
-                </button>
-              </div>
-            </div>
-
-            {/* Market Data */}
-            <div className="bg-gray-800 rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-2">Market Data</h2>
-              <p className="text-2xl font-bold">${price.toFixed(2)}</p>
-            </div>
-
-            {/* Recent Trades */}
-            <div className="bg-gray-800 rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-4">Recent Trades</h2>
-              <div className="space-y-2">
-                {trades.map((trade, index) => (
-                  <div 
-                    key={index}
-                    className="flex justify-between items-center bg-gray-700 p-2 rounded"
-                  >
-                    <span className={trade.type === "BUY" ? "text-green-500" : "text-red-500"}>
-                      {trade.type}
-                    </span>
-                    <span>${trade.price.toFixed(2)}</span>
-                    <span className="text-gray-400">{trade.timestamp}</span>
-                  </div>
-                ))}
               </div>
             </div>
           </div>
-        )}
+
+          <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Trading Statistics</h2>
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Win Rate</span>
+                <span>65%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Total Trades</span>
+                <span>{tradeHistory.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Avg. Trade Size</span>
+                <span>${(parseFloat(tradeAmount) * currentPrice).toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Trade History */}
+        <div className="bg-gray-800 rounded-xl shadow-lg">
+          <div className="p-6 border-b border-gray-700">
+            <h2 className="text-xl font-bold">Recent Trades</h2>
+          </div>
+          <div className="p-6">
+            <div className="space-y-3">
+              {tradeHistory.map((trade, index) => (
+                <div key={index} className="flex items-center justify-between bg-gray-700 p-4 rounded-lg">
+                  <span className={`font-bold ${trade.type === "BUY" ? "text-green-500" : "text-red-500"}`}>
+                    {trade.type}
+                  </span>
+                  <span>{trade.amount.toFixed(2)} Units</span>
+                  <span>${trade.price.toFixed(2)}</span>
+                  <span className="text-gray-400">{trade.timestamp}</span>
+                </div>
+              ))}
+              {tradeHistory.length === 0 && (
+                <div className="text-center text-gray-400 py-4">
+                  No trades yet. Start trading to see your history.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
