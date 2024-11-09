@@ -12,7 +12,6 @@ body {
   
   /* Page Container */
   .min-h-screen {
-    background: linear-gradient(145deg, #1a1a1a, #1c1c1c);
     color: #fff;
     padding: 2rem;
     border-radius: 16px;
@@ -83,7 +82,7 @@ body {
   select {
     width: 100%;
     background: rgba(255, 255, 255, 0.06);
-    color: #f1f1f1;
+    color: #000000;
     padding: 0.75rem;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.2);
