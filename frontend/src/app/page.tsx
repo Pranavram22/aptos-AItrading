@@ -1,6 +1,7 @@
-"use client"
-import React, { useState, useEffect } from 'react';
-import { FaPlay, FaStop, FaChartLine, FaHistory, FaCog, FaWallet } from 'react-icons/fa';
+"use client";
+import React, { useState, useEffect } from "react";
+import { FaPlay, FaStop, FaWallet, FaArrowUp, FaArrowDown, FaDollarSign, FaClock } from "react-icons/fa";
+import "./TradingPlatform.css";
 
 interface TradeHistory {
   type: "BUY" | "SELL";
@@ -16,13 +17,12 @@ export default function TradingPlatform() {
   const [tradeHistory, setTradeHistory] = useState<TradeHistory[]>([]);
   const [profitLoss, setProfitLoss] = useState<number>(0);
   const [selectedTimeframe, setSelectedTimeframe] = useState("1h");
-  const [balance, setBalance] = useState("1000.00"); // Simulated balance
+  const [balance, setBalance] = useState("1000.00");
 
-  // Simulated price feed
   useEffect(() => {
     if (isTrading) {
       const interval = setInterval(() => {
-        setCurrentPrice(prev => {
+        setCurrentPrice((prev) => {
           const change = (Math.random() - 0.5) * 0.5;
           return Number((prev + change).toFixed(2));
         });
@@ -32,26 +32,24 @@ export default function TradingPlatform() {
     }
   }, [isTrading]);
 
-  // Simulated trading logic
   useEffect(() => {
     if (isTrading) {
       const interval = setInterval(() => {
         const decision = Math.random() > 0.5 ? "BUY" : "SELL";
         const amount = parseFloat(tradeAmount);
-        
+
         const newTrade: TradeHistory = {
           type: decision,
           amount: amount,
           price: currentPrice,
-          timestamp: new Date().toLocaleTimeString()
+          timestamp: new Date().toLocaleTimeString(),
         };
 
-        setTradeHistory(prev => [newTrade, ...prev].slice(0, 10));
-        
+        setTradeHistory((prev) => [newTrade, ...prev].slice(0, 10));
+
         const tradeValue = amount * currentPrice;
         const tradePL = decision === "BUY" ? -tradeValue : tradeValue;
-        setProfitLoss(prev => Number((prev + tradePL).toFixed(2)));
-        
+        setProfitLoss((prev) => Number((prev + tradePL).toFixed(2)));
       }, 15000);
 
       return () => clearInterval(interval);
@@ -60,7 +58,6 @@ export default function TradingPlatform() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
-      {/* Header */}
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">AI Trading Platform</h1>
@@ -79,9 +76,12 @@ export default function TradingPlatform() {
             <div className="text-gray-400 mb-2 text-sm">Balance</div>
             <div className="text-3xl font-bold">${balance}</div>
           </div>
-          <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+          <div className="bg-gray-800 p-6 rounded-xl shadow-lg relative overflow-hidden">
             <div className="text-gray-400 mb-2 text-sm">Profit/Loss</div>
-            <div className={`text-3xl font-bold ${profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            <div
+              className={`text-3xl font-bold ${profitLoss >= 0 ? "text-green-500" : "text-red-500"} transition-colors duration-500 flex items-center`}
+            >
+              {profitLoss >= 0 ? <FaArrowUp className="mr-2" /> : <FaArrowDown className="mr-2" />}
               ${profitLoss.toFixed(2)}
             </div>
           </div>
@@ -89,11 +89,13 @@ export default function TradingPlatform() {
 
         {/* Trading Controls */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-2 bg-gray-800 p-6 rounded-xl shadow-lg">
+          <div className="lg:col-span-2 bg-gradient-to-r from-gray-800 to-gray-700 p-6 rounded-xl shadow-lg relative overflow-hidden">
             <h2 className="text-xl font-bold mb-4">Trading Controls</h2>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
-                <label className="block text-sm text-gray-400 mb-2">Trade Amount</label>
+                <label className="block text-sm text-gray-400 mb-2 flex items-center">
+                  <FaDollarSign className="mr-2" /> Trade Amount
+                </label>
                 <input
                   type="number"
                   value={tradeAmount}
@@ -104,7 +106,9 @@ export default function TradingPlatform() {
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-sm text-gray-400 mb-2">Timeframe</label>
+                <label className="block text-sm text-gray-400 mb-2 flex items-center">
+                  <FaClock className="mr-2" /> Timeframe
+                </label>
                 <select
                   value={selectedTimeframe}
                   onChange={(e) => setSelectedTimeframe(e.target.value)}
@@ -118,10 +122,8 @@ export default function TradingPlatform() {
               <div className="flex-1 flex items-end">
                 <button
                   onClick={() => setIsTrading(!isTrading)}
-                  className={`w-full p-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors ${
-                    isTrading 
-                      ? 'bg-red-600 hover:bg-red-700' 
-                      : 'bg-green-600 hover:bg-green-700'
+                  className={`w-full p-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors shadow-md ${
+                    isTrading ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"
                   }`}
                 >
                   {isTrading ? <><FaStop /> Stop Trading</> : <><FaPlay /> Start Trading</>}
